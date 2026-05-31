@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DayFlow — Your Personal Task Planner</title>
+  <meta name="description" content="A beautiful personal to-do app to manage daily tasks, track completions, and review your productivity." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Ambient background orbs -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+
+  <div class="app-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <span class="logo-icon">◈</span>
+          <span class="logo-text">DayFlow</span>
+        </div>
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+
+      <!-- Nav tabs -->
+      <nav class="nav-tabs">
+        <button class="nav-tab active" id="tabToday" data-tab="today" aria-label="Today's tasks">
+          <span class="nav-icon">✦</span>
+          <span class="nav-label">Today</span>
+        </button>
+        <button class="nav-tab" id="tabCalendar" data-tab="calendar" aria-label="Calendar view">
+          <span class="nav-icon">◫</span>
+          <span class="nav-label">Calendar</span>
+        </button>
+        <button class="nav-tab" id="tabReview" data-tab="review" aria-label="Review past days">
+          <span class="nav-icon">◉</span>
+          <span class="nav-label">Review</span>
+        </button>
+      </nav>
+
+      <!-- Mini calendar (always visible in sidebar) -->
+      <div class="mini-calendar-section">
+        <div class="mini-cal-nav">
+          <button class="cal-nav-btn" id="miniPrevMonth" aria-label="Previous month">‹</button>
+          <span class="mini-cal-month" id="miniCalMonth"></span>
+          <button class="cal-nav-btn" id="miniNextMonth" aria-label="Next month">›</button>
+        </div>
+        <div class="mini-cal-weekdays">
+          <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+        </div>
+        <div class="mini-cal-grid" id="miniCalGrid"></div>
+      </div>
+
+      <!-- Quick stats -->
+      <div class="sidebar-stats">
+        <div class="stat-item">
+          <span class="stat-label">Today's Progress</span>
+          <div class="stat-bar-wrap">
+            <div class="stat-bar" id="sidebarProgressBar"></div>
+          </div>
+          <span class="stat-val" id="sidebarProgressVal">0%</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Streak 🔥</span>
+          <span class="stat-val streak-val" id="streakCount">0 days</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- TODAY VIEW -->
+      <section class="view active" id="viewToday">
+        <div class="view-header">
+          <div>
+            <p class="view-subtitle" id="todaySubtitle">Loading...</p>
+            <h1 class="view-title">Today's Tasks</h1>
+          </div>
+          <div class="header-actions">
+            <div class="progress-ring-wrap" id="todayRingWrap">
+              <svg class="progress-ring" viewBox="0 0 80 80">
+                <circle class="ring-bg" cx="40" cy="40" r="34"/>
+                <circle class="ring-fill" id="todayRingFill" cx="40" cy="40" r="34"
+                  stroke-dasharray="213.6"
+                  stroke-dashoffset="213.6"/>
+              </svg>
+              <span class="ring-label" id="todayRingLabel">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Task input -->
+        <div class="task-input-card glass-card">
+          <input type="text" id="newTaskInput" class="task-input" placeholder="Add a new task for today…" maxlength="120" autocomplete="off" />
+          <button class="add-task-btn" id="addTaskBtn" aria-label="Add task">
+            <span>+</span>
+          </button>
+        </div>
+
+        <!-- Task list -->
+        <div class="task-list-wrap">
+          <div class="task-section-label">
+            <span id="todayPendingLabel">Pending</span>
+          </div>
+          <div class="task-list" id="todayTaskList">
+            <div class="empty-state" id="todayEmptyState">
+              <span class="empty-icon">🌿</span>
+              <p>No tasks yet. Add one above!</p>
+            </div>
+          </div>
+
+          <div class="task-section-label completed-label" id="completedSectionLabel" style="display:none">
+            <span>Completed</span>
+          </div>
+          <div class="task-list" id="todayCompletedList"></div>
+        </div>
+
+        <!-- My Goals Section -->
+        <div class="goals-section">
+          <div class="goals-section-header">
+            <span class="goals-section-icon">🎯</span>
+            <h2 class="goals-section-title">My Goals</h2>
+            <span class="goals-section-sub">Your personal compass — always visible</span>
+          </div>
+
+          <div class="goals-grid">
+            <!-- Your Goals -->
+            <div class="goal-panel glass-card" id="goalPanelGoals">
+              <div class="goal-panel-header goals-header" id="goalHeaderGoals">
+                <span class="goal-panel-icon">⭐</span>
+                <span class="goal-panel-title">Your Goals</span>
+                <span class="goal-count" id="goalCountGoals">0</span>
+                <span class="goal-expand-hint">double-click to expand</span>
+                <span class="goal-chevron">▼</span>
+              </div>
+              <div class="goal-input-row">
+                <input type="text" id="goalInputGoals" class="goal-input" placeholder="Add a goal…" maxlength="120" autocomplete="off" />
+                <button class="goal-add-btn" id="goalAddGoals" aria-label="Add goal">+</button>
+              </div>
+              <div class="goal-items" id="goalListGoals">
+                <div class="goal-empty" id="goalEmptyGoals">No goals yet. Dream big! 🌠</div>
+              </div>
+            </div>
+
+            <!-- Things to Do -->
+            <div class="goal-panel glass-card" id="goalPanelDo">
+              <div class="goal-panel-header do-header" id="goalHeaderDo">
+                <span class="goal-panel-icon">✅</span>
+                <span class="goal-panel-title">Things to Do</span>
+                <span class="goal-count" id="goalCountDo">0</span>
+                <span class="goal-expand-hint">double-click to expand</span>
+                <span class="goal-chevron">▼</span>
+              </div>
+              <div class="goal-input-row">
+                <input type="text" id="goalInputDo" class="goal-input" placeholder="Something to practise…" maxlength="120" autocomplete="off" />
+                <button class="goal-add-btn do-btn" id="goalAddDo" aria-label="Add habit">+</button>
+              </div>
+              <div class="goal-items" id="goalListDo">
+                <div class="goal-empty" id="goalEmptyDo">Nothing added yet. Start building habits! 💪</div>
+              </div>
+            </div>
+
+            <!-- Things to Avoid -->
+            <div class="goal-panel glass-card" id="goalPanelAvoid">
+              <div class="goal-panel-header avoid-header" id="goalHeaderAvoid">
+                <span class="goal-panel-icon">🚫</span>
+                <span class="goal-panel-title">Things to Avoid</span>
+                <span class="goal-count" id="goalCountAvoid">0</span>
+                <span class="goal-expand-hint">double-click to expand</span>
+                <span class="goal-chevron">▼</span>
+              </div>
+              <div class="goal-input-row">
+                <input type="text" id="goalInputAvoid" class="goal-input" placeholder="Something to stay away from…" maxlength="120" autocomplete="off" />
+                <button class="goal-add-btn avoid-btn" id="goalAddAvoid" aria-label="Add avoidance">+</button>
+              </div>
+              <div class="goal-items" id="goalListAvoid">
+                <div class="goal-empty" id="goalEmptyAvoid">Nothing here yet. Know your limits! 🛑</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CALENDAR VIEW -->
+      <section class="view" id="viewCalendar">
+        <div class="view-header">
+          <div>
+            <p class="view-subtitle">Pick a day & plan it out</p>
+            <h1 class="view-title" id="calViewTitle">Calendar</h1>
+          </div>
+        </div>
+
+        <div class="calendar-main glass-card">
+          <div class="cal-nav-row">
+            <button class="cal-nav-btn-lg" id="calPrevMonth" aria-label="Previous month">‹</button>
+            <span class="cal-month-label" id="calMonthLabel"></span>
+            <button class="cal-nav-btn-lg" id="calNextMonth" aria-label="Next month">›</button>
+          </div>
+          <div class="cal-weekdays">
+            <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+        </div>
+
+        <!-- Selected day task panel -->
+        <div class="cal-day-panel glass-card" id="calDayPanel">
+          <div class="cal-day-panel-header">
+            <h2 class="cal-day-title" id="calDayTitle">Select a day</h2>
+            <div class="cal-day-progress">
+              <span id="calDayProgressText">—</span>
+            </div>
+          </div>
+
+          <div class="task-input-card flat">
+            <input type="text" id="calNewTaskInput" class="task-input" placeholder="Add a task for this day…" maxlength="120" autocomplete="off" />
+            <button class="add-task-btn" id="calAddTaskBtn" aria-label="Add task">+</button>
+          </div>
+
+          <div class="task-list" id="calDayTaskList">
+            <div class="empty-state" id="calEmptyState">
+              <span class="empty-icon">📅</span>
+              <p>No tasks for this day.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- REVIEW VIEW -->
+      <section class="view" id="viewReview">
+        <div class="view-header">
+          <div>
+            <p class="view-subtitle">How have you been doing?</p>
+            <h1 class="view-title">Past Review</h1>
+          </div>
+        </div>
+
+        <div class="review-summary-cards" id="reviewSummaryCards">
+          <!-- injected by JS -->
+        </div>
+
+        <div class="review-list-header">
+          <span class="review-list-title">Day-by-Day Breakdown</span>
+          <select class="review-filter" id="reviewFilter" aria-label="Filter review">
+            <option value="all">All days with tasks</option>
+            <option value="past">Past only</option>
+            <option value="week">This week</option>
+            <option value="month">This month</option>
+          </select>
+        </div>
+
+        <div class="review-grid" id="reviewGrid">
+          <div class="empty-state" id="reviewEmptyState">
+            <span class="empty-icon">📊</span>
+            <p>No data yet. Start adding tasks!</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
